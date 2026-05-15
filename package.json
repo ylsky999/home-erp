@@ -1,0 +1,8 @@
+{
+  "name": "home-erp",
+  "version": "1.0.0",
+  "description": "家庭仓库 ERP",
+  "engines": {
+    "node": ">=18"
+  }
+}
