@@ -1,1 +1,1127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>家庭仓库</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=DM+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f4f1ea;
+  --surface: #fdfcf8;
+  --surface2: #f8f5ee;
+  --ink: #1c1a16;
+  --ink2: #56524a;
+  --ink3: #9c9789;
+  --accent: #bf7b35;
+  --accent-dim: #eedfc6;
+  --accent-hover: #a86828;
+  --green: #3a7a4e;
+  --green-dim: #d2eddc;
+  --red: #be3a2a;
+  --red-dim: #fde8e5;
+  --yellow-dim: #fef3cd;
+  --yellow-ink: #7a5c00;
+  --border: #e4dfd5;
+  --border2: #cec9be;
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 4px rgba(28,26,22,.06);
+  --shadow: 0 2px 16px rgba(28,26,22,.09);
+  --shadow-lg: 0 8px 40px rgba(28,26,22,.13);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  min-height:100vh;
+  line-height:1.5;
+}
 
+/* ─── NAV ─── */
+nav{
+  position:sticky;top:0;z-index:200;
+  background:rgba(253,252,248,.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;
+  height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.logo{
+  font-family:'Noto Serif SC',serif;
+  font-size:17px;font-weight:700;
+  color:var(--ink);letter-spacing:.06em;
+}
+.logo em{color:var(--accent);font-style:normal;}
+.nav-tabs{display:flex;gap:4px;}
+.nav-tab{
+  padding:7px 16px;border-radius:20px;
+  font-size:13px;font-weight:500;
+  cursor:pointer;border:none;
+  background:transparent;color:var(--ink3);
+  transition:all .15s;font-family:'Inter',sans-serif;
+}
+.nav-tab.active{background:var(--accent);color:#fff;}
+.nav-tab:hover:not(.active){background:var(--surface2);color:var(--ink);}
+
+/* ─── PAGE WRAPPER ─── */
+.page{display:none;}
+.page.active{display:block;}
+
+/* ─── ENTRY PAGE ─── */
+.entry-wrap{
+  max-width:680px;margin:0 auto;
+  padding:28px 20px 100px;
+}
+
+/* Mode toggle */
+.mode-bar{
+  display:flex;gap:0;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;padding:4px;
+  margin-bottom:24px;
+}
+.mode-btn{
+  flex:1;padding:9px;
+  border:none;background:transparent;
+  border-radius:9px;font-size:13px;font-weight:500;
+  cursor:pointer;color:var(--ink3);
+  transition:all .15s;font-family:'Inter',sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.mode-btn.active{
+  background:var(--accent);color:#fff;
+  box-shadow:0 1px 6px rgba(191,123,53,.3);
+}
+.mode-btn:hover:not(.active){color:var(--ink);background:var(--surface2);}
+
+/* Section label */
+.sec-label{
+  font-family:'DM Mono',monospace;
+  font-size:11px;font-weight:500;
+  color:var(--ink3);letter-spacing:.1em;
+  text-transform:uppercase;
+  margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* Upload zone */
+.upload-zone{
+  background:var(--surface);
+  border:1.5px dashed var(--border2);
+  border-radius:var(--radius-lg);
+  padding:44px 20px;
+  text-align:center;cursor:pointer;
+  position:relative;transition:all .2s;
+  margin-bottom:0;
+}
+.upload-zone:hover,.upload-zone.drag{
+  border-color:var(--accent);
+  background:rgba(191,123,53,.04);
+}
+.upload-zone input[type=file]{
+  position:absolute;inset:0;
+  opacity:0;cursor:pointer;width:100%;height:100%;
+}
+.upload-icon-ring{
+  width:56px;height:56px;
+  background:var(--accent-dim);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 14px;font-size:26px;
+}
+.upload-h{
+  font-family:'Noto Serif SC',serif;
+  font-size:15px;font-weight:600;
+  color:var(--ink);margin-bottom:5px;
+}
+.upload-sub{font-size:12px;color:var(--ink3);}
+
+/* Preview */
+#preview-wrap{display:none;margin-bottom:0;}
+#preview-img{
+  width:100%;max-height:300px;
+  object-fit:contain;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+  background:var(--surface);display:block;
+}
+.preview-row{
+  display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;
+}
+
+/* Text input */
+#text-area-wrap{display:none;margin-bottom:0;}
+#text-desc{
+  width:100%;min-height:110px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:14px;font-size:14px;
+  font-family:'Inter',sans-serif;
+  color:var(--ink);resize:vertical;
+  outline:none;transition:border-color .15s;
+  line-height:1.6;
+}
+#text-desc:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(191,123,53,.1);}
+#text-desc::placeholder{color:var(--ink3);}
+.text-action{margin-top:10px;}
+
+/* AI Status bar */
+#ai-bar{
+  display:none;
+  align-items:center;gap:10px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:13px 16px;
+  margin-top:16px;font-size:13px;color:var(--ink2);
+}
+#ai-bar.loading{border-color:var(--accent);background:rgba(191,123,53,.04);}
+#ai-bar.ok{border-color:var(--green);background:var(--green-dim);color:var(--green);}
+#ai-bar.err{border-color:var(--red);background:var(--red-dim);color:var(--red);}
+.spin{
+  width:16px;height:16px;flex-shrink:0;
+  border:2px solid var(--accent-dim);
+  border-top-color:var(--accent);
+  border-radius:50%;animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ─── FORM ─── */
+#item-form{display:none;margin-top:20px;}
+
+.form-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:20px;margin-bottom:14px;
+}
+.form-card-title{
+  font-family:'Noto Serif SC',serif;
+  font-size:13px;font-weight:600;
+  color:var(--ink2);margin-bottom:16px;
+  padding-bottom:10px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:7px;
+}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-full{grid-column:1/-1;}
+@media(max-width:540px){.form-grid{grid-template-columns:1fr;}}
+
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{
+  font-size:11px;font-weight:500;
+  color:var(--ink3);letter-spacing:.04em;
+  font-family:'DM Mono',monospace;
+  display:flex;align-items:center;gap:6px;
+  text-transform:uppercase;
+}
+.req{color:var(--accent);font-size:14px;line-height:1;}
+.ai-pill{
+  display:inline-flex;align-items:center;gap:3px;
+  background:var(--accent-dim);color:var(--accent);
+  padding:1px 7px;border-radius:4px;
+  font-size:10px;font-family:'DM Mono',monospace;
+  font-weight:500;letter-spacing:.02em;
+  text-transform:none;
+}
+.field input,.field select,.field textarea{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:9px 12px;
+  font-size:14px;color:var(--ink);
+  font-family:'Inter',sans-serif;
+  transition:border-color .15s;outline:none;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:var(--accent);background:var(--surface);
+  box-shadow:0 0 0 3px rgba(191,123,53,.1);
+}
+.field input[readonly]{background:var(--surface2);color:var(--ink3);}
+.field textarea{resize:vertical;min-height:64px;}
+.price-wrap{position:relative;}
+.price-sym{
+  position:absolute;left:11px;top:50%;
+  transform:translateY(-50%);color:var(--ink3);
+  font-size:14px;pointer-events:none;
+}
+.price-wrap input{padding-left:24px;}
+
+/* Category grid */
+.cat-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(80px,1fr));
+  gap:7px;margin-top:2px;
+}
+.cat-tile{
+  display:flex;flex-direction:column;align-items:center;
+  gap:4px;padding:9px 4px;
+  border:1px solid var(--border);border-radius:10px;
+  cursor:pointer;background:var(--bg);
+  transition:all .15s;font-size:11px;
+  color:var(--ink2);text-align:center;
+}
+.cat-tile:hover,.cat-tile.on{
+  background:var(--accent-dim);border-color:var(--accent);color:var(--accent);
+}
+.cat-tile .ci{font-size:20px;}
+input[type=hidden]{display:none;}
+
+/* Location chips */
+.loc-wrap{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px;}
+.loc-chip{
+  padding:5px 12px;border:1px solid var(--border);
+  border-radius:20px;font-size:12px;
+  cursor:pointer;background:var(--bg);color:var(--ink2);
+  transition:all .15s;
+}
+.loc-chip:hover,.loc-chip.on{
+  background:var(--accent-dim);border-color:var(--accent);color:var(--accent);
+}
+
+/* Expiry toggle */
+.toggle-row{
+  display:flex;align-items:center;gap:10px;
+  cursor:pointer;user-select:none;
+}
+.tog-track{
+  width:36px;height:20px;border-radius:10px;
+  background:var(--border2);position:relative;
+  transition:background .2s;flex-shrink:0;
+}
+.tog-track::after{
+  content:'';position:absolute;
+  width:14px;height:14px;
+  background:#fff;border-radius:50%;
+  top:3px;left:3px;
+  transition:transform .2s;
+  box-shadow:0 1px 3px rgba(0,0,0,.2);
+}
+.tog-track.on{background:var(--accent);}
+.tog-track.on::after{transform:translateX(16px);}
+.toggle-label{font-size:14px;font-weight:500;color:var(--ink2);}
+.toggle-hint{font-size:12px;color:var(--ink3);}
+
+#expiry-body{display:none;margin-top:14px;}
+#expiry-body.open{display:block;}
+.sugg-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--accent-dim);border:1px solid #ddc99a;
+  color:var(--accent);padding:5px 12px;border-radius:20px;
+  font-size:12px;cursor:pointer;transition:all .15s;
+  margin-top:8px;
+}
+.sugg-chip:hover{background:#e5d0aa;}
+
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:10px 20px;border-radius:9px;
+  font-size:14px;font-weight:500;
+  cursor:pointer;border:none;transition:all .15s;
+  font-family:'Inter',sans-serif;white-space:nowrap;
+}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent-hover);}
+.btn-primary:disabled{background:#d4c4ae;cursor:not-allowed;}
+.btn-ghost{background:transparent;color:var(--ink2);border:1px solid var(--border);}
+.btn-ghost:hover{background:var(--surface2);}
+.btn-save{background:var(--green);color:#fff;padding:12px 28px;font-size:15px;}
+.btn-save:hover{background:#2d6040;}
+.form-footer{
+  display:flex;gap:12px;flex-wrap:wrap;
+  margin-top:20px;padding-top:18px;
+  border-top:1px solid var(--border);
+}
+
+/* ─── INVENTORY PAGE ─── */
+.inv-wrap{
+  max-width:1100px;margin:0 auto;
+  padding:28px 20px 80px;
+}
+.inv-toolbar{
+  display:flex;align-items:center;
+  gap:12px;margin-bottom:24px;flex-wrap:wrap;
+}
+.inv-toolbar h2{
+  font-family:'Noto Serif SC',serif;
+  font-size:20px;font-weight:700;color:var(--ink);
+  margin-right:auto;
+}
+.search-box{
+  display:flex;align-items:center;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:9px;padding:0 12px;gap:7px;
+  flex:1;min-width:180px;max-width:280px;
+}
+.search-box input{
+  border:none;background:transparent;
+  padding:9px 0;font-size:14px;
+  color:var(--ink);outline:none;width:100%;
+  font-family:'Inter',sans-serif;
+}
+.search-box input::placeholder{color:var(--ink3);}
+.filter-select{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:9px;padding:9px 12px;
+  font-size:13px;color:var(--ink2);
+  font-family:'Inter',sans-serif;outline:none;cursor:pointer;
+}
+.stats-bar{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:10px;margin-bottom:24px;
+}
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:14px 16px;
+}
+.stat-label{font-size:11px;color:var(--ink3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.stat-val{font-size:22px;font-weight:600;color:var(--ink);}
+.stat-val.warn{color:var(--red);}
+.stat-val.accent{color:var(--accent);}
+
+/* Items grid */
+.items-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:14px;
+}
+.item-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:0;overflow:hidden;
+  transition:box-shadow .2s,transform .2s;
+  cursor:default;
+}
+.item-card:hover{box-shadow:var(--shadow);transform:translateY(-1px);}
+.item-card-img{
+  width:100%;height:130px;
+  object-fit:cover;background:var(--surface2);
+  display:block;border-bottom:1px solid var(--border);
+}
+.item-card-img-placeholder{
+  width:100%;height:130px;
+  background:var(--surface2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;
+}
+.item-card-body{padding:14px 16px;}
+.item-row1{
+  display:flex;align-items:flex-start;
+  justify-content:space-between;gap:8px;
+  margin-bottom:8px;
+}
+.item-name{
+  font-family:'Noto Serif SC',serif;
+  font-size:14px;font-weight:600;
+  color:var(--ink);line-height:1.4;
+  flex:1;
+}
+.cat-badge{
+  font-size:10px;font-family:'DM Mono',monospace;
+  padding:2px 8px;border-radius:4px;
+  background:var(--accent-dim);color:var(--accent);
+  white-space:nowrap;flex-shrink:0;
+}
+.item-meta{
+  display:flex;flex-direction:column;gap:3px;
+  font-size:12px;color:var(--ink3);
+  margin-bottom:10px;
+}
+.item-meta span{display:flex;align-items:center;gap:5px;}
+.exp-tag{
+  display:inline-block;
+  font-size:11px;padding:3px 9px;
+  border-radius:5px;font-weight:500;
+}
+.exp-ok{background:var(--green-dim);color:var(--green);}
+.exp-soon{background:var(--yellow-dim);color:var(--yellow-ink);}
+.exp-dead{background:var(--red-dim);color:var(--red);}
+.item-actions{
+  display:flex;gap:6px;margin-top:10px;
+  padding-top:10px;border-top:1px solid var(--border);
+}
+.action-btn{
+  flex:1;padding:6px;border:1px solid var(--border);
+  border-radius:6px;background:transparent;
+  font-size:12px;color:var(--ink3);cursor:pointer;
+  font-family:'Inter',sans-serif;transition:all .15s;
+}
+.action-btn:hover{background:var(--surface2);color:var(--ink);}
+.action-btn.danger:hover{background:var(--red-dim);color:var(--red);border-color:var(--red);}
+
+/* empty */
+.empty{
+  grid-column:1/-1;text-align:center;
+  padding:60px 20px;color:var(--ink3);
+}
+.empty-icon{font-size:48px;margin-bottom:14px;}
+.empty p{font-size:15px;}
+
+/* ─── Toast ─── */
+#toast{
+  position:fixed;bottom:24px;left:50%;
+  transform:translateX(-50%) translateY(100px);
+  background:var(--ink);color:#fff;
+  padding:11px 24px;border-radius:100px;
+  font-size:13px;z-index:999;
+  transition:transform .3s ease;
+  pointer-events:none;white-space:nowrap;
+  box-shadow:var(--shadow-lg);
+}
+#toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ─── Modal ─── */
+#modal-backdrop{
+  display:none;position:fixed;inset:0;
+  background:rgba(28,26,22,.45);
+  z-index:500;align-items:center;justify-content:center;
+  padding:20px;
+}
+#modal-backdrop.show{display:flex;}
+.modal-box{
+  background:var(--surface);
+  border-radius:var(--radius-lg);
+  padding:24px;width:100%;max-width:480px;
+  box-shadow:var(--shadow-lg);
+}
+.modal-title{
+  font-family:'Noto Serif SC',serif;
+  font-size:16px;font-weight:700;
+  margin-bottom:16px;
+}
+.modal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">家庭<em>仓库</em></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('entry')">入库</button>
+    <button class="nav-tab" onclick="showPage('inventory')">库存</button>
+  </div>
+</nav>
+
+<!-- ══════════ ENTRY PAGE ══════════ -->
+<div class="page active" id="page-entry">
+<div class="entry-wrap">
+
+  <div class="mode-bar">
+    <button class="mode-btn active" id="modeBtn-image" onclick="switchMode('image')">
+      <span>📷</span> 拍照 / 图片
+    </button>
+    <button class="mode-btn" id="modeBtn-text" onclick="switchMode('text')">
+      <span>✏️</span> 文字描述
+    </button>
+  </div>
+
+  <!-- Image mode -->
+  <div id="image-mode">
+    <div class="sec-label">上传商品图片</div>
+    <div class="upload-zone" id="upload-zone">
+      <input type="file" id="file-input" accept="image/*" capture="environment">
+      <div class="upload-icon-ring">📷</div>
+      <div class="upload-h">拍照 / 上传图片</div>
+      <div class="upload-sub">支持 JPG · PNG · HEIC · WEBP，点击或拖拽</div>
+    </div>
+    <div id="preview-wrap">
+      <img id="preview-img" alt="预览">
+      <div class="preview-row">
+        <button class="btn btn-primary" onclick="doAnalyze()"><span>✦</span> AI 解析</button>
+        <button class="btn btn-ghost" onclick="resetUpload()">重新选择</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Text mode -->
+  <div id="text-mode" style="display:none">
+    <div class="sec-label">文字描述</div>
+    <textarea id="text-desc" placeholder="用自然语言描述商品，例如：&#10;• 买了两瓶蒙牛纯牛奶，花了18块，放冰箱，保质期到明年三月&#10;• 洗衣液一桶，3公斤，放阳台储物柜&#10;• 买了一袋苹果，7个，放冰箱冷藏"></textarea>
+    <div class="text-action">
+      <button class="btn btn-primary" onclick="doAnalyze()"><span>✦</span> AI 解析</button>
+    </div>
+  </div>
+
+  <!-- AI status -->
+  <div id="ai-bar">
+    <div class="spin" id="ai-spin"></div>
+    <span id="ai-msg">正在解析…</span>
+  </div>
+
+  <!-- ── FORM ── -->
+  <div id="item-form">
+
+    <!-- 基本信息 -->
+    <div class="form-card">
+      <div class="form-card-title">📋 基本信息</div>
+      <div class="form-grid">
+        <div class="field form-full">
+          <label><span class="req">·</span> 商品名称 <span class="ai-pill" id="aib-name" style="display:none">✦ AI</span></label>
+          <input type="text" id="f-name" placeholder="商品名称">
+        </div>
+        <div class="field">
+          <label>价格（元）<span class="ai-pill" id="aib-price" style="display:none">✦ AI</span></label>
+          <div class="price-wrap">
+            <span class="price-sym">¥</span>
+            <input type="number" id="f-price" placeholder="0.00" step="0.01" min="0">
+          </div>
+        </div>
+        <div class="field">
+          <label>数量</label>
+          <input type="text" id="f-qty" placeholder="如：2瓶、1箱、500g">
+        </div>
+        <div class="field form-full">
+          <label><span class="req">·</span> 购买 / 入库时间</label>
+          <input type="datetime-local" id="f-indate">
+        </div>
+      </div>
+    </div>
+
+    <!-- 分类 -->
+    <div class="form-card">
+      <div class="form-card-title">🏷 商品分类 <span class="ai-pill" id="aib-cat" style="display:none">✦ AI</span></div>
+      <div class="cat-grid">
+        <div class="cat-tile" data-v="食品饮料" onclick="pickCat(this)"><span class="ci">🍎</span>食品饮料</div>
+        <div class="cat-tile" data-v="生鲜蔬果" onclick="pickCat(this)"><span class="ci">🥦</span>生鲜蔬果</div>
+        <div class="cat-tile" data-v="日用耗材" onclick="pickCat(this)"><span class="ci">🧴</span>日用耗材</div>
+        <div class="cat-tile" data-v="清洁用品" onclick="pickCat(this)"><span class="ci">🧹</span>清洁用品</div>
+        <div class="cat-tile" data-v="药品保健" onclick="pickCat(this)"><span class="ci">💊</span>药品保健</div>
+        <div class="cat-tile" data-v="电子产品" onclick="pickCat(this)"><span class="ci">📱</span>电子产品</div>
+        <div class="cat-tile" data-v="衣物纺织" onclick="pickCat(this)"><span class="ci">👕</span>衣物纺织</div>
+        <div class="cat-tile" data-v="文具办公" onclick="pickCat(this)"><span class="ci">📝</span>文具办公</div>
+        <div class="cat-tile" data-v="厨具餐具" onclick="pickCat(this)"><span class="ci">🍳</span>厨具餐具</div>
+        <div class="cat-tile" data-v="其他" onclick="pickCat(this)"><span class="ci">📦</span>其他</div>
+      </div>
+      <input type="hidden" id="f-cat">
+    </div>
+
+    <!-- 存放 -->
+    <div class="form-card">
+      <div class="form-card-title">📍 存放信息</div>
+      <div class="form-grid">
+        <div class="field form-full">
+          <label>存储位置 <span class="ai-pill" id="aib-loc" style="display:none">✦ AI</span></label>
+          <input type="text" id="f-loc" placeholder="自定义位置">
+          <div class="loc-wrap">
+            <div class="loc-chip" onclick="pickLoc(this,'冰箱冷藏')">🧊 冰箱冷藏</div>
+            <div class="loc-chip" onclick="pickLoc(this,'冰箱冷冻')">❄️ 冰箱冷冻</div>
+            <div class="loc-chip" onclick="pickLoc(this,'厨房橱柜')">🗄️ 厨房橱柜</div>
+            <div class="loc-chip" onclick="pickLoc(this,'阳台储物')">📦 阳台储物</div>
+            <div class="loc-chip" onclick="pickLoc(this,'卧室衣柜')">🚪 卧室衣柜</div>
+            <div class="loc-chip" onclick="pickLoc(this,'卫生间')">🚿 卫生间</div>
+            <div class="loc-chip" onclick="pickLoc(this,'书房')">📚 书房</div>
+          </div>
+        </div>
+        <div class="field form-full">
+          <label>保存方式 <span class="ai-pill" id="aib-storage" style="display:none">✦ AI</span></label>
+          <input type="text" id="f-storage" placeholder="如：常温避光、冷藏2-8℃、阴凉干燥处">
+        </div>
+      </div>
+    </div>
+
+    <!-- 保质期 -->
+    <div class="form-card">
+      <div class="form-card-title">⏳ 保质期</div>
+      <div class="toggle-row" onclick="toggleExp()">
+        <div class="tog-track" id="exp-track"></div>
+        <span class="toggle-label">有保质期</span>
+        <span class="toggle-hint">食品、药品、生鲜等</span>
+      </div>
+      <div id="expiry-body">
+        <div class="form-grid" style="margin-top:0">
+          <div class="field">
+            <label>保质期至 <span class="ai-pill" id="aib-exp" style="display:none">✦ AI</span></label>
+            <input type="date" id="f-expiry">
+          </div>
+          <div class="field">
+            <label>建议食用期限 <span class="ai-pill" id="aib-sugg" style="display:none">✦ AI估算</span></label>
+            <input type="date" id="f-sugg">
+          </div>
+        </div>
+        <div id="sugg-wrap"></div>
+      </div>
+    </div>
+
+    <!-- 备注 -->
+    <div class="form-card">
+      <div class="form-card-title">💬 备注</div>
+      <div class="field">
+        <textarea id="f-note" placeholder="品牌、规格、其他信息…"></textarea>
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <button class="btn btn-save" onclick="saveItem()">✓ 确认入库</button>
+      <button class="btn btn-ghost" onclick="resetAll()">取消</button>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════ INVENTORY PAGE ══════════ -->
+<div class="page" id="page-inventory">
+<div class="inv-wrap">
+
+  <div class="inv-toolbar">
+    <h2>库存总览</h2>
+    <div class="search-box">
+      <span style="color:var(--ink3);font-size:14px">🔍</span>
+      <input type="text" id="search-input" placeholder="搜索商品…" oninput="renderInventory()">
+    </div>
+    <select class="filter-select" id="cat-filter" onchange="renderInventory()">
+      <option value="">全部分类</option>
+      <option>食品饮料</option><option>生鲜蔬果</option><option>日用耗材</option>
+      <option>清洁用品</option><option>药品保健</option><option>电子产品</option>
+      <option>衣物纺织</option><option>文具办公</option><option>厨具餐具</option><option>其他</option>
+    </select>
+    <select class="filter-select" id="exp-filter" onchange="renderInventory()">
+      <option value="">全部状态</option>
+      <option value="soon">即将过期</option>
+      <option value="expired">已过期</option>
+    </select>
+  </div>
+
+  <div class="stats-bar" id="stats-bar"></div>
+  <div class="items-grid" id="items-grid"></div>
+
+</div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Edit modal -->
+<div id="modal-backdrop">
+  <div class="modal-box">
+    <div class="modal-title">编辑物品</div>
+    <div id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">取消</button>
+      <button class="btn btn-save" onclick="saveEdit()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════ STATE ══════
+let db = JSON.parse(localStorage.getItem('herp_v2') || '[]');
+let mode = 'image';
+let expOn = false;
+let imgB64 = null;
+let editId = null;
+
+// ══════ INIT ══════
+(function init() {
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const local = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  document.getElementById('f-indate').value = local;
+
+  // Drag and drop
+  const zone = document.getElementById('upload-zone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag'); const f = e.dataTransfer.files[0]; if(f&&f.type.startsWith('image/')) loadFile(f); });
+  document.getElementById('file-input').addEventListener('change', e => { if(e.target.files[0]) loadFile(e.target.files[0]); });
+})();
+
+// ══════ PAGE NAV ══════
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&p==='entry')||(i===1&&p==='inventory')));
+  if(p==='inventory') renderInventory();
+}
+
+// ══════ MODE ══════
+function switchMode(m) {
+  mode = m;
+  document.getElementById('modeBtn-image').classList.toggle('active', m==='image');
+  document.getElementById('modeBtn-text').classList.toggle('active', m==='text');
+  document.getElementById('image-mode').style.display = m==='image' ? 'block' : 'none';
+  document.getElementById('text-mode').style.display = m==='text' ? 'block' : 'none';
+  resetForm();
+  hideBar();
+}
+
+// ══════ FILE ══════
+function loadFile(f) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    imgB64 = e.target.result.split(',')[1];
+    document.getElementById('preview-img').src = e.target.result;
+    document.getElementById('preview-wrap').style.display = 'block';
+    document.getElementById('upload-zone').style.display = 'none';
+  };
+  reader.readAsDataURL(f);
+}
+function resetUpload() {
+  imgB64 = null;
+  document.getElementById('preview-wrap').style.display = 'none';
+  document.getElementById('upload-zone').style.display = 'block';
+  document.getElementById('file-input').value = '';
+  resetForm(); hideBar();
+}
+
+// ══════ AI ANALYZE ══════
+async function doAnalyze() {
+  if(mode==='image' && !imgB64) { toast('请先选择图片'); return; }
+  if(mode==='text' && !document.getElementById('text-desc').value.trim()) { toast('请先输入描述'); return; }
+  setBar('loading','正在调用 AI 解析，请稍候…');
+
+  try {
+    const body = mode==='image'
+      ? { mode:'image', imageBase64: imgB64 }
+      : { mode:'text', text: document.getElementById('text-desc').value.trim() };
+
+    const res = await fetch('/api/ai', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if(data.error) throw new Error(data.error);
+
+    const raw = data.choices?.[0]?.message?.content || '';
+    const json = parseJSON(raw);
+    if(!json) throw new Error('AI 返回格式异常，请重试');
+
+    fillForm(json);
+    setBar('ok', `✓ 解析完成：${json.name || '商品'}  —  请核对信息后点击入库`);
+  } catch(e) {
+    console.error(e);
+    setBar('err', `✗ ${e.message}`);
+    document.getElementById('item-form').style.display = 'block';
+  }
+}
+
+function parseJSON(txt) {
+  try {
+    const c = txt.replace(/```json|```/g,'').trim();
+    const m = c.match(/\{[\s\S]*\}/);
+    if(m) return JSON.parse(m[0]);
+  } catch(_){}
+  return null;
+}
+
+// ══════ FILL FORM ══════
+function fillForm(d, ai=true) {
+  document.getElementById('item-form').style.display = 'block';
+  const set = (id,val,bid) => {
+    if(val===null||val===undefined||val==='') return;
+    const el = document.getElementById(id);
+    if(el) { el.value=val; if(bid&&ai) showBadge(bid); }
+  };
+
+  set('f-name', d.name, 'aib-name');
+  set('f-price', d.price, 'aib-price');
+  set('f-qty', d.quantity);
+  set('f-loc', d.storage_location, 'aib-loc');
+  set('f-storage', d.storage_method, 'aib-storage');
+  set('f-note', d.notes);
+
+  // sync loc chips
+  if(d.storage_location) {
+    document.querySelectorAll('.loc-chip').forEach(c => {
+      c.classList.toggle('on', c.textContent.includes(d.storage_location));
+    });
+  }
+
+  // category
+  if(d.category) {
+    document.getElementById('f-cat').value = d.category;
+    document.querySelectorAll('.cat-tile').forEach(t => t.classList.toggle('on', t.dataset.v===d.category));
+    if(ai) showBadge('aib-cat');
+  }
+
+  // expiry
+  if(d.has_expiry) {
+    if(!expOn) toggleExp();
+    if(d.expiry_date) { set('f-expiry', d.expiry_date, 'aib-exp'); }
+    if(d.suggested_expiry_days) {
+      const sugg = new Date(Date.now() + d.suggested_expiry_days*86400000);
+      document.getElementById('f-sugg').value = sugg.toISOString().slice(0,10);
+      if(ai) showBadge('aib-sugg');
+      document.getElementById('sugg-wrap').innerHTML =
+        `<div class="sugg-chip" onclick="useSugg(${d.suggested_expiry_days})">✦ AI建议：${d.suggested_expiry_days}天内食用${d.expiry_note?' — '+d.expiry_note:''}</div>`;
+    }
+  }
+}
+
+function showBadge(id) {
+  const el = document.getElementById(id);
+  if(el) el.style.display='inline-flex';
+}
+
+// ══════ FORM CONTROLS ══════
+function pickCat(el) {
+  document.querySelectorAll('.cat-tile').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('f-cat').value = el.dataset.v;
+  const noExp = ['电子产品','衣物纺织','文具办公','厨具餐具'];
+  if(noExp.includes(el.dataset.v) && expOn) toggleExp();
+}
+
+function pickLoc(el, val) {
+  document.querySelectorAll('.loc-chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('f-loc').value = val;
+}
+
+function toggleExp() {
+  expOn = !expOn;
+  document.getElementById('exp-track').classList.toggle('on', expOn);
+  document.getElementById('expiry-body').classList.toggle('open', expOn);
+}
+
+function useSugg(days) {
+  const d = new Date(Date.now() + days*86400000);
+  document.getElementById('f-sugg').value = d.toISOString().slice(0,10);
+}
+
+// ══════ SAVE ══════
+function saveItem() {
+  const name = document.getElementById('f-name').value.trim();
+  if(!name) { toast('请填写商品名称'); return; }
+
+  const item = {
+    id: Date.now(),
+    name,
+    category: document.getElementById('f-cat').value || '其他',
+    price: document.getElementById('f-price').value || null,
+    qty: document.getElementById('f-qty').value || null,
+    indate: document.getElementById('f-indate').value,
+    location: document.getElementById('f-loc').value,
+    storage: document.getElementById('f-storage').value,
+    has_expiry: expOn,
+    expiry: expOn ? document.getElementById('f-expiry').value : null,
+    sugg: expOn ? document.getElementById('f-sugg').value : null,
+    note: document.getElementById('f-note').value,
+    img: imgB64 ? ('data:image/jpeg;base64,'+imgB64) : null,
+    created: Date.now()
+  };
+
+  db.unshift(item);
+  persist();
+  resetAll();
+  toast(`✓  ${name} 已入库`);
+}
+
+function persist() {
+  localStorage.setItem('herp_v2', JSON.stringify(db));
+}
+
+// ══════ RESET ══════
+function resetAll() {
+  resetForm(); hideBar();
+  imgB64 = null;
+  document.getElementById('preview-wrap').style.display = 'none';
+  document.getElementById('upload-zone').style.display = 'block';
+  document.getElementById('file-input').value = '';
+  document.getElementById('text-desc').value = '';
+}
+
+function resetForm() {
+  document.getElementById('item-form').style.display = 'none';
+  ['f-name','f-price','f-qty','f-loc','f-storage','f-expiry','f-sugg','f-note'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('f-cat').value = '';
+  document.querySelectorAll('.cat-tile').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('.loc-chip').forEach(c => c.classList.remove('on'));
+  document.querySelectorAll('.ai-pill').forEach(b => b.style.display='none');
+  if(expOn) toggleExp();
+  document.getElementById('sugg-wrap').innerHTML = '';
+
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('f-indate').value =
+    `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+}
+
+// ══════ AI BAR ══════
+function setBar(type, msg) {
+  const bar = document.getElementById('ai-bar');
+  bar.style.display = 'flex';
+  bar.className = type;
+  document.getElementById('ai-spin').style.display = type==='loading' ? 'block' : 'none';
+  document.getElementById('ai-msg').textContent = msg;
+  if(type !== 'loading') document.getElementById('item-form').style.display = 'block';
+}
+function hideBar() {
+  document.getElementById('ai-bar').style.display = 'none';
+}
+
+// ══════ INVENTORY ══════
+function renderInventory() {
+  const q = (document.getElementById('search-input')?.value||'').toLowerCase();
+  const cf = document.getElementById('cat-filter')?.value||'';
+  const ef = document.getElementById('exp-filter')?.value||'';
+
+  let items = db.filter(item => {
+    if(q && !item.name.toLowerCase().includes(q) && !(item.category||'').toLowerCase().includes(q)) return false;
+    if(cf && item.category !== cf) return false;
+    if(ef === 'soon') {
+      const d = expDiff(item); return d !== null && d >= 0 && d <= 7;
+    }
+    if(ef === 'expired') {
+      const d = expDiff(item); return d !== null && d < 0;
+    }
+    return true;
+  });
+
+  // Stats
+  const total = db.length;
+  const expiring = db.filter(i => { const d=expDiff(i); return d!==null&&d>=0&&d<=7; }).length;
+  const expired = db.filter(i => { const d=expDiff(i); return d!==null&&d<0; }).length;
+  document.getElementById('stats-bar').innerHTML = `
+    <div class="stat-card"><div class="stat-label">总物品</div><div class="stat-val accent">${total}</div></div>
+    <div class="stat-card"><div class="stat-label">即将过期</div><div class="stat-val ${expiring>0?'warn':''}">${expiring}</div></div>
+    <div class="stat-card"><div class="stat-label">已过期</div><div class="stat-val ${expired>0?'warn':''}">${expired}</div></div>
+    <div class="stat-card"><div class="stat-label">本月入库</div><div class="stat-val">${db.filter(i=>{ const d=new Date(i.indate||i.created); const n=new Date(); return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear(); }).length}</div></div>
+  `;
+
+  const grid = document.getElementById('items-grid');
+  if(!items.length) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">📦</div><p>${db.length?'没有符合条件的物品':'暂无库存，去入库添加第一件物品'}</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = items.map(item => {
+    const expTag = getExpTag(item);
+    const catIcon = catEmoji(item.category);
+    const imgHtml = item.img
+      ? `<img class="item-card-img" src="${item.img}" alt="${esc(item.name)}">`
+      : `<div class="item-card-img-placeholder">${catIcon}</div>`;
+    const dateStr = item.indate ? new Date(item.indate).toLocaleDateString('zh-CN',{month:'short',day:'numeric'}) : '';
+    return `
+    <div class="item-card">
+      ${imgHtml}
+      <div class="item-card-body">
+        <div class="item-row1">
+          <div class="item-name">${esc(item.name)}</div>
+          <div class="cat-badge">${esc(item.category||'其他')}</div>
+        </div>
+        <div class="item-meta">
+          ${item.price?`<span>💰 ¥${item.price}</span>`:''}
+          ${item.qty?`<span>📦 ${esc(item.qty)}</span>`:''}
+          ${item.location?`<span>📍 ${esc(item.location)}</span>`:''}
+          ${dateStr?`<span>📅 ${dateStr}入库</span>`:''}
+          ${item.storage?`<span>🌡 ${esc(item.storage)}</span>`:''}
+          ${item.note?`<span>💬 ${esc(item.note)}</span>`:''}
+        </div>
+        ${expTag}
+        <div class="item-actions">
+          <button class="action-btn" onclick="editItem(${item.id})">✏ 编辑</button>
+          <button class="action-btn danger" onclick="deleteItem(${item.id})">✕ 删除</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function expDiff(item) {
+  if(!item.has_expiry) return null;
+  const d = item.sugg || item.expiry;
+  if(!d) return null;
+  return Math.ceil((new Date(d) - new Date()) / 86400000);
+}
+
+function getExpTag(item) {
+  const diff = expDiff(item);
+  if(diff === null) return '';
+  const dateStr = item.sugg || item.expiry;
+  if(diff < 0) return `<div class="exp-tag exp-dead">已过期 ${-diff} 天</div>`;
+  if(diff <= 7) return `<div class="exp-tag exp-soon">⚠ 还剩 ${diff} 天</div>`;
+  return `<div class="exp-tag exp-ok">✓ ${dateStr} 前食用</div>`;
+}
+
+function catEmoji(cat) {
+  const m = {'食品饮料':'🍎','生鲜蔬果':'🥦','日用耗材':'🧴','清洁用品':'🧹',
+    '药品保健':'💊','电子产品':'📱','衣物纺织':'👕','文具办公':'📝','厨具餐具':'🍳','其他':'📦'};
+  return m[cat] || '📦';
+}
+
+// ══════ EDIT ══════
+function editItem(id) {
+  const item = db.find(i => i.id===id);
+  if(!item) return;
+  editId = id;
+  document.getElementById('modal-body').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div class="field"><label>商品名称</label><input type="text" id="e-name" value="${esc(item.name||'')}"></div>
+      <div class="form-grid">
+        <div class="field"><label>价格</label><input type="number" id="e-price" value="${item.price||''}"></div>
+        <div class="field"><label>数量</label><input type="text" id="e-qty" value="${esc(item.qty||'')}"></div>
+      </div>
+      <div class="field"><label>存储位置</label><input type="text" id="e-loc" value="${esc(item.location||'')}"></div>
+      <div class="field"><label>保存方式</label><input type="text" id="e-storage" value="${esc(item.storage||'')}"></div>
+      ${item.has_expiry ? `
+      <div class="form-grid">
+        <div class="field"><label>保质期至</label><input type="date" id="e-expiry" value="${item.expiry||''}"></div>
+        <div class="field"><label>建议食用期限</label><input type="date" id="e-sugg" value="${item.sugg||''}"></div>
+      </div>` : ''}
+      <div class="field"><label>购买时间</label><input type="datetime-local" id="e-indate" value="${item.indate||''}"></div>
+      <div class="field"><label>备注</label><textarea id="e-note">${esc(item.note||'')}</textarea></div>
+    </div>`;
+  document.getElementById('modal-backdrop').classList.add('show');
+}
+
+function saveEdit() {
+  const item = db.find(i => i.id===editId);
+  if(!item) return;
+  item.name = document.getElementById('e-name').value;
+  item.price = document.getElementById('e-price').value || null;
+  item.qty = document.getElementById('e-qty').value || null;
+  item.location = document.getElementById('e-loc').value;
+  item.storage = document.getElementById('e-storage').value;
+  item.indate = document.getElementById('e-indate').value;
+  item.note = document.getElementById('e-note').value;
+  if(item.has_expiry) {
+    item.expiry = document.getElementById('e-expiry')?.value || null;
+    item.sugg = document.getElementById('e-sugg')?.value || null;
+  }
+  persist();
+  closeModal();
+  renderInventory();
+  toast('✓ 已更新');
+}
+
+function deleteItem(id) {
+  if(!confirm('确定删除这件物品？')) return;
+  db = db.filter(i => i.id !== id);
+  persist();
+  renderInventory();
+  toast('已删除');
+}
+
+function closeModal() {
+  document.getElementById('modal-backdrop').classList.remove('show');
+  editId = null;
+}
+document.getElementById('modal-backdrop').addEventListener('click', e => {
+  if(e.target === document.getElementById('modal-backdrop')) closeModal();
+});
+
+// ══════ TOAST ══════
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
